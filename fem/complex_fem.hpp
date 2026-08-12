@@ -469,6 +469,11 @@ public:
                              BilinearFormIntegrator *bfi_imag,
                              Array<int> &bdr_marker);
 
+   /// @todo Added by AP.
+   /// Adds new Trace Face Integrator.
+   void AddTraceFaceIntegrator(BilinearFormIntegrator *bfi_real,
+                            BilinearFormIntegrator *bfi_imag);
+
    /// Assemble the local matrix
    void Assemble(int skip_zeros = 1);
 

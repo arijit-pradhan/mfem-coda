@@ -119,6 +119,11 @@ protected:
    Array<BilinearFormIntegrator*> boundary_face_integs;
    Array<Array<int>*> boundary_face_integs_marker; ///< Entries are not owned.
 
+   /// @todo Added Here by AP. Need to be checked with NB.
+   /// Set of trace face Integrators to be applied.
+   Array<BilinearFormIntegrator*> trace_face_integs;
+   Array<Array<int>*> trace_face_integs_marker; ///< Entries are not owned.
+
    mutable DenseMatrix elemmat;
    mutable Array<int>  vdofs;
 
@@ -288,6 +293,12 @@ public:
    Array<Array<int>*> *GetBFBFI_Marker()
    { return &boundary_face_integs_marker; }
 
+   /// Access all the integrators added with AddTraceFaceIntegrator().
+   Array<BilinearFormIntegrator*> *GetTFBFI() { return &trace_face_integs; }
+
+   Array<Array<int>*> *GetTFBFI_Marker()
+   { return &trace_face_integs_marker; }
+
    /// Returns a reference to: $ M_{ij} $
    const real_t &operator()(int i, int j) { return (*mat)(i,j); }
 
@@ -436,6 +447,13 @@ public:
        as a pointer to the given Array<int> object. */
    void AddBdrFaceIntegrator(BilinearFormIntegrator *bfi,
                              Array<int> &bdr_marker);
+
+   ///@todo Added by AP. Needed to be checked with NB.
+   /// Adds new interior Face Integrator. Assumes ownership of @a bfi.
+   void AddTraceFaceIntegrator(BilinearFormIntegrator *bfi);
+
+   void AddTraceFaceIntegrator(BilinearFormIntegrator *bfi,
+                                 Array<int> &bdr_marker);
 
    /// Sets all sparse values of $ M $ and $ M_e $ to 'a'.
    void operator=(const real_t a)

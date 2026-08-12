@@ -273,6 +273,19 @@ void BilinearForm::AddBdrFaceIntegrator(BilinearFormIntegrator *bfi,
    boundary_face_integs_marker.Append(&bdr_marker);
 }
 
+void BilinearForm::AddTraceFaceIntegrator(BilinearFormIntegrator * bfi)
+{
+   trace_face_integs.Append (bfi);
+   trace_face_integs_marker.Append(NULL); // NULL marker means apply everywhere
+}
+
+void BilinearForm::AddTraceFaceIntegrator(BilinearFormIntegrator *bfi,
+                                          Array<int> &bdr_marker)
+{
+   trace_face_integs.Append(bfi);
+   trace_face_integs_marker.Append(&bdr_marker);
+}
+
 void BilinearForm::ComputeElementMatrix(int i, DenseMatrix &elmat) const
 {
    if (element_matrices)
@@ -747,6 +760,34 @@ void BilinearForm::Assemble(int skip_zeros)
                doftrans.TransformDual(elemmat);
                mat -> AddSubMatrix (vdofs, vdofs, elemmat, skip_zeros);
             }
+         }
+      }
+   }
+
+   ///@todo Added by AP. Need to be checked with NB.
+   if (trace_face_integs.Size())
+   {
+      ElementTransformation *T;
+      const int nfaces = fes->GetMesh()->GetNumFaces();
+      for (int i = 0; i < nfaces; i++)
+      {
+
+        //    fes->GetEdgeVDofs(i, vdofs);
+           fes->GetFaceVDofs(i, vdofs);
+        //    T = mesh->GetEdgeTransformation(i);
+           T = mesh->GetFaceTransformation(i);
+
+         for (int j = 0; j < trace_face_integs.Size(); j++)
+         {
+             if (trace_face_integs_marker[j] &&
+                   (*trace_face_integs_marker[j])[i] == 0)
+               { continue; }
+            // if(use_edge_el)
+            //   trace_face_integs[j]->AssembleElementMatrix(*fes->GetEdgeElement(i), *T, elmat);
+            // else
+              trace_face_integs[j]->AssembleElementMatrix(*fes->GetFaceElement(i), *T, elmat);
+            // // trace_face_integs[j]->AssembleElementMatrix(*fes->GetEdgeElement(i), *T, elmat);
+            mat -> AddSubMatrix (vdofs, vdofs, elmat, skip_zeros);
          }
       }
    }

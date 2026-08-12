@@ -474,14 +474,16 @@ ComplexLinearForm::operator()(const ComplexGridFunction &gf) const
 bool SesquilinearForm::RealInteg()
 {
    int nint = blfr->GetFBFI()->Size() + blfr->GetDBFI()->Size() +
-              blfr->GetBBFI()->Size() + blfr->GetBFBFI()->Size();
+              blfr->GetBBFI()->Size() + blfr->GetBFBFI()->Size() +
+              blfr->GetTFBFI()->Size();
    return (nint != 0);
 }
 
 bool SesquilinearForm::ImagInteg()
 {
    int nint = blfi->GetFBFI()->Size() + blfi->GetDBFI()->Size() +
-              blfi->GetBBFI()->Size() + blfi->GetBFBFI()->Size();
+              blfi->GetBBFI()->Size() + blfi->GetBFBFI()->Size() +
+              blfi->GetTFBFI()->Size();
    return (nint != 0);
 }
 
@@ -564,6 +566,13 @@ void SesquilinearForm::AddBdrFaceIntegrator(BilinearFormIntegrator *bfi_real,
 {
    if (bfi_real) { blfr->AddBdrFaceIntegrator(bfi_real, bdr_marker); }
    if (bfi_imag) { blfi->AddBdrFaceIntegrator(bfi_imag, bdr_marker); }
+}
+
+void SesquilinearForm::AddTraceFaceIntegrator(BilinearFormIntegrator *bfi_real,
+                            BilinearFormIntegrator *bfi_imag)
+{
+   if (bfi_real) { blfr->AddTraceFaceIntegrator(bfi_real); }
+   if (bfi_imag) { blfi->AddTraceFaceIntegrator(bfi_imag); }
 }
 
 void
